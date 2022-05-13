@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Usage</h2>
+    <h3>Not Properly Secured, this is test version</h3>
+
+<dl>
+  <dt>List all movies -GET</dt>
+  <dd>- http://127.0.0.1:8000/api/</dd><br>
+
+  <dt>Movie Search by ID -GET</dt>
+  <dd>- http://127.0.0.1:8000/api/movie/1</dd>
+  <dd>- {{request.META.HTTP_HOST}}/api/movie/[MOVIE-ID]</dd><br>
+  <br>
+  <dt>Add movie by Title -POST </dt>
+  <dd>- http://127.0.0.1:8000/api/movie/morbius</dd>
+  <dd>- {{request.META.HTTP_HOST}}/api/movie/[MOVIE-TITLE] **(POST this request with name)</dd><br>
+  <br>
+  <dt>List All comments -GET </dt>
+  <dd>- http://127.0.0.1:8000/api/comment/</dd>
+  <dd>- {{request.META.HTTP_HOST}}/api/comment/ **(Returns all Movies with comments)</dd><br>
+  <br>
+  <dt>Add Comment by ID of Movie -POST </dt>
+  <dd>- http://127.0.0.1:8000/api/comment/1</dd>
+  <dd>- {{request.META.HTTP_HOST}}/api/comment/[MOVIE-ID] **(POST to this url with {"comment":"comment data"}) to add comment</dd><br>
+  <br>
+  <dt>Search comment by Title  -GET </dt>
+  <dd>- http://127.0.0.1:8000/api/comment/movie/Titan</dd>
+  <dd>- {{request.META.HTTP_HOST}}/api/comment/movie/[MOVIE TITLE] **(Return the Title and comment)</dd><br>
+  <br>
+</dl>
+
+</body>
+</html>
