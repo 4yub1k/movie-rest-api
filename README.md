@@ -1,6 +1,7 @@
 # movie-rest-api
 Django REST framework, Django based api to fetch and provide details about movies.
 
+Web: http://salah.pythonanywhere.com/
 <dl>
   <dt>List all movies -GET</dt>
   <dd>- http://127.0.0.1:8000/api/</dd><br>
