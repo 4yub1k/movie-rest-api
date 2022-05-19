@@ -1,5 +1,5 @@
 # movie-rest-api
-Django REST framework, Django based api to fetch and provide details about movies from external api, you can add comments(or of users) to movies.
+Django REST framework, Django based api to fetch, store and provide details about movies from external api by movie name, you can add comments(or of users) to movies. For more read **Usage**.
 
 ![D-version](https://img.shields.io/badge/Django-4.0.4-blue)
 ![P-version](https://img.shields.io/badge/Python-3.10-green)
