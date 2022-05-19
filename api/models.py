@@ -1,10 +1,6 @@
 from django.db import models
 
 class Movie(models.Model):
-    """
-    ADJUST THE FIELD SIZE ACCORDINGLY, I PREFER TO USE VARIABLE NAMES WITH SMALL NOT CAPITAL, BUT
-    IT IS ADJUSTED ACCORDING TO THE <https://www.omdbapi.com>
-    """
     Title=models.CharField(max_length=200)
     Year=models.CharField(max_length=200)
     Rated=models.CharField(max_length=200)
@@ -30,6 +26,12 @@ class Movie(models.Model):
     Production=models.CharField(max_length=200)
     Website= models.CharField(max_length=200)
     Response= models.BooleanField(default=True)
-    comment=models.TextField(max_length=800, default="")
+    #comment=models.CharField(max_length=200, default="")
     def __str__(self):
         return "Moive : {}".format(self.Title)
+
+class Comment(models.Model):
+    movie_id=models.ForeignKey(Movie, on_delete=models.CASCADE)
+    comment=models.CharField(max_length=200, blank=False)
+    def __str__(self):
+        return self.comment

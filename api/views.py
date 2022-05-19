@@ -1,54 +1,45 @@
 from django.shortcuts import render,HttpResponse
-from django.http import JsonResponse #FOR JSON response
+from django.http import JsonResponse
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import MovieSerializer,CommentSerializer
-from api.models import Movie
+from api.models import Movie,Comment
 from rest_framework import status
-from django.shortcuts import get_object_or_404 #USE WITH model.objects.get()
-import requests # best way it to, import only get method from requests as it is only used here, or use urllib
+from requests import get
+from django.db.models import F
 
-"""
-FOR HIGH TRAFFIC SITE : I PREFER asyncio or concurrent.futures
-"""
 
-"""
-FOR:    path('',views.index, name='index'), #redirect to main page
-"""
+
 def index(request):
     return render(request,'main.html')
 
-###################################### -API- ######################################################
-
-"""
-FOR:    path('api/',views.list_movies, name='list_movies'),
-"""
-@api_view(['GET'])
-def list_movies(request):
-    if request.method == 'GET':# THIS LINE IS NOT NEEDED, IT ONLY MAKE THINGS CLEAR
-        movies=Movie.objects.all()
-        movie_serializer=MovieSerializer(movies, many=True)
-        return Response(movie_serializer.data)
-
-"""
-FOR:    path('movie/<str:mv>',views.movie, name='movie'),
-"""
 @api_view(['GET','POST'])
-def movie(request, mv):
+def movie(request):
     if request.method == 'GET':
-        try:
-            movies=Movie.objects.get(id=mv)
-        except: #except Movie.DoesNotExist: #to catch only not found here.
-            return Response({"id":"No Movie by this id"}, status=status.HTTP_404_NOT_FOUND) 
-        movie_serializer=MovieSerializer(movies, many=False)
-        return Response(movie_serializer.data)    
-    elif request.method == 'POST':
+        mv=request.query_params.get('id',None)
+        all=request.query_params.get('list',None)
+        if mv:
+            try:
+                movies=Movie.objects.get(id=mv)
+            except: #except Movie.DoesNotExist:
+                return Response({"id":"No Movie by this id"}, status=status.HTTP_404_NOT_FOUND) 
+            movie_serializer=MovieSerializer(movies, many=False)
+            return Response(movie_serializer.data)
+        if all=='all':
+            movies=Movie.objects.all()
+            movie_serializer=MovieSerializer(movies, many=True)
+            return Response(movie_serializer.data)
+
+    if request.method == 'POST':
+        mv=request.query_params.get('movie',None)
         url=f'https://www.omdbapi.com/?t={mv}&apikey=b1811c1'
-        page=requests.get(url).json()
+        page=get(url).json()
+        #print(page)
         if 'Error' in page:
             return Response({"Response":"False","Error":"Movie not found!"}, status=status.HTTP_404_NOT_FOUND) 
         movies=Movie.objects.filter(Title__icontains=mv).exists()
+        #print(movies)
         if not movies:
             serializer = MovieSerializer(data=page)
             if serializer.is_valid():
@@ -56,55 +47,52 @@ def movie(request, mv):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"Warning":"Movie Exists"}, status=status.HTTP_409_CONFLICT) 
-        
-"""
-FOR:    path('comment/<int:id>',views.comment, name='comment'),
-"""
+
+    data={"command":["/?list=all, to list all comments",
+                "/?movie=<movie name>, to add movie",
+                "/?id=<movie id>, to search movie by id"]}
+    return Response(data, status=status.HTTP_200_OK)
+
 @api_view(['GET','POST'])
-def comment(request, id):
+def comment(request):
     if request.method == 'GET':
-        try:
-            movies=Movie.objects.get(id=id)
-        except Movie.DoesNotExist:
-            return Response({"id":"No Movie by this id"}, status=status.HTTP_404_NOT_FOUND) 
-        movie_serializer=MovieSerializer(movies, many=False)
-        return Response(movie_serializer.data)
+        id=request.query_params.get('id',None)
+        all=request.query_params.get('list',None)
+        movie_name=request.query_params.get('movie',None)
+        if id:
+            try:
+                movies=Movie.objects.filter(id=id)
+            except Movie.DoesNotExist:
+                return Response({"id":"No Movie by this id"}, status=status.HTTP_404_NOT_FOUND) 
+            movie=movies.annotate(comments=F('comment__comment')).values('id','Title','comments')
+            return Response(movie)
+        elif all=='all':
+            try:
+                movies=Movie.objects.annotate(comments=F('comment__comment')).values('id','Title','comments')
+            except Movie.DoesNotExist:
+                return Response({"id":"No Movie by this id"}, status=status.HTTP_404_NOT_FOUND) 
+            return Response(movies)
+        elif movie_name:
+            try:
+                #movies=Movie.objects.get(Title__icontains=movie_name)
+                movies=Movie.objects.filter(Title__iexact=movie_name)
+            except Movie.DoesNotExist:
+                return Response({"Title":f"No Movie by this {movie_name} "}, status=status.HTTP_404_NOT_FOUND) 
+            movies=movies.annotate(comments=F('comment__comment')).values('id','Title','comments')
+            return Response(movies)
 
     if request.method == 'POST':
+        id=request.query_params.get('id',None)
         try:
             movies=Movie.objects.filter(id=id)
         except Movie.DoesNotExist:
             return Response({"id":"No Movie by this id"}, status=status.HTTP_404_NOT_FOUND) 
-        movie_serializer=CommentSerializer(data=request.data)
-        serializer = movie_serializer
+        serializer =CommentSerializer(data=request.data)
         if serializer.is_valid():
-            movies.update(comment=serializer.data.get('comment'))
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-"""
-FOR:    path('comment/',views.all_comment, name='comments'),
-"""
-@api_view(['GET'])
-def all_comment(request):
-    if request.method == 'GET':# THIS LINE IS NOT NEEDED, IT ONLY MAKE THINGS CLEAR
-        try:
-            movies=Movie.objects.values('Title','comment')
-        except Movie.DoesNotExist:
-            return Response({"id":"No Movie by this id"}, status=status.HTTP_404_NOT_FOUND) 
-        return Response(movies)
-
-"""
-FOR:    path('comment/movie/<str:mv>',views.movie_comment, name='movie_comment'),
-"""
-@api_view(['GET'])
-def movie_comment(request,mv):
-    if request.method == 'GET':# THIS LINE IS NOT NEEDED, IT ONLY MAKE THINGS CLEAR
-        data={}
-        try:
-            movies=Movie.objects.get(Title__icontains=mv)
-            data['Movie']=movies.Title
-            data['Comment']=movies.comment
-        except Movie.DoesNotExist:
-            return Response({"Title":f"No Movie by this {mv} "}, status=status.HTTP_404_NOT_FOUND) 
-        return Response(data)
+    
+    data={"command":["/?list=all, to list all comments",
+                "/?movie_name=<movie name>, to search comment by movie"]}
+    return Response(data, status=status.HTTP_200_OK)

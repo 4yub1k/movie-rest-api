@@ -8,33 +8,51 @@
 </head>
 <body>
     <h2>Usage</h2>
-    <h3>Not Properly Secured, this is test version</h3>
-
 <dl>
   <dt>List all movies -GET</dt>
-  <dd>- http://127.0.0.1:8000/api/</dd><br>
+  <dd>- http://127.0.0.1:8000/movies/?list=all</dd><br>
 
   <dt>Movie Search by ID -GET</dt>
-  <dd>- http://127.0.0.1:8000/api/movie/1</dd>
-  <dd>- {{request.META.HTTP_HOST}}/api/movie/[MOVIE-ID]</dd><br>
+  <dd>- http://127.0.0.1:8000/movies/?id=1</dd>
+  <dd>- {{request.META.HTTP_HOST}}/movies/?id=1</dd><br>
   <br>
   <dt>Add movie by Title -POST </dt>
-  <dd>- http://127.0.0.1:8000/api/movie/morbius</dd>
-  <dd>- {{request.META.HTTP_HOST}}/api/movie/[MOVIE-TITLE] **(POST this request with name)</dd><br>
+  <dd>- http://127.0.0.1:8000/movies/?movie=Oscar</dd>
+  <dd>- {{request.META.HTTP_HOST}}/movies/?movie=(movie name) **(POST this request with name)</dd><br>
   <br>
   <dt>List All comments -GET </dt>
-  <dd>- http://127.0.0.1:8000/api/comment/</dd>
-  <dd>- {{request.META.HTTP_HOST}}/api/comment/ **(Returns all Movies with comments)</dd><br>
+  <dd>- http://127.0.0.1:8000/comment/?list=all</dd>
+  <dd>- {{request.META.HTTP_HOST}}/comment/?list=all **(Returns all Movies with comments)</dd><br>
   <br>
   <dt>Add Comment by ID of Movie -POST </dt>
-  <dd>- http://127.0.0.1:8000/api/comment/1</dd>
-  <dd>- {{request.META.HTTP_HOST}}/api/comment/[MOVIE-ID] **(POST to this url with {"comment":"comment data"}) to add comment</dd><br>
+  <dd>- http://127.0.0.1:8000/comment/</dd>
+  <dd>- {{request.META.HTTP_HOST}}/comment/ **(POST to this url with {
+        "movie_id":1,
+        "comment":"movie comments"
+        }) to add comment</dd><br>
+  <br>
+  <dt>Search comment by ID  -GET </dt>
+  <dd>- http://127.0.0.1:8000/comment/?id=1</dd>
+  <dd>- {{request.META.HTTP_HOST}}/comment/?id=1 **(Return the id, Title and comment)</dd><br>
   <br>
   <dt>Search comment by Title  -GET </dt>
-  <dd>- http://127.0.0.1:8000/api/comment/movie/Titan</dd>
-  <dd>- {{request.META.HTTP_HOST}}/api/comment/movie/[MOVIE TITLE] **(Return the Title and comment)</dd><br>
-  <br>
+  <dd>- http://127.0.0.1:8000/comment/?movie=(movie name)</dd>
+  <dd>- {{request.META.HTTP_HOST}}/comment/?movie=(movie name) **(Return the id, Title and comment)</dd><br>
 </dl>
+<style>
+  body{
+    margin: auto;
+    width: 50%;
+    border: 3px solid black;
+    padding: 10px;
+  }
+  dl{
+    border:1px solid black;
+    background:#F5F5F5;
+    color:#000;
+    padding: 10px 10px 10px 10px;
+  }
 
+</style>
 </body>
 </html>

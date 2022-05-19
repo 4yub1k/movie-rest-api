@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -13,13 +12,15 @@ Note: ALWAY USE ENV VARIABLES FOR SENSITIVE INFORMATION **
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-t6gp0(wp)gy9te=u@7o)!uj)z(b2^cee6utzc&qq&l^n4z2p+#'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = (os.environ.get('DJANGO_DEBUG')=="True")
 
 ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS.extend(
+    filter(None,os.environ.get('ALLOWED_HOSTS', '').split(','),)
+)
 
 # Application definition
 
@@ -82,25 +83,16 @@ WSGI_APPLICATION = 'movie.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 
-"""
-I PREFER <POSTgreSQL> AS IT IS MORE COMPATIBLE WITH DJANGO, AND ITS SPEED AND STABILITY.
-"""
-
-"""
-MY PREFERENCE OF DATABASE NUMBER WISE:
-1-ORACLE #FOR CORPORATE LEVEL
-2-POSTgreSQL #FOR ALL BUSINESSES
-3-MYsql #FOR SMALL/MEDIUM-OR HAVE NO OTHER CHOICE
-4-SQLite #FOR TESTING, FOR SMALL PROJECTS ,LOW TRAFFIC
-"""
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('USER_DB'),
+        'USER': os.environ.get('USER_USER'),
+        'PASSWORD': os.environ.get('USER_PASSWORD'),
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -137,7 +129,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
+API_KEY = os.environ.get("API_KEY")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

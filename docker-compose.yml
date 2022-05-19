@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    restart: always
+    volumes:
+      - .:/django
+    ports:
+      - 8000:8080
+    image: app:django
+    container_name: django_container
+    environment:
+      - DJANGO_DEBUG
+      - SECRET_KEY
+      - API_KEY
+      - USER_DB=${POSTGRES_DB}
+      - USER_USER=${POSTGRES_USER}
+      - USER_PASSWORD=${POSTGRES_PASSWORD}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+    command: bash -c "
+            python3 manage.py makemigrations api &&
+            python3 manage.py migrate &&
+            python3 manage.py runserver 0.0.0.0:8080"
+    depends_on:
+      - db 
+  db:
+    image: postgres:14
+    restart: always
+    volumes:
+      - ./data/postdb:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    networks:
+      - default
+    ports:
+      - 5432:5432
+    container_name: postgres_db
