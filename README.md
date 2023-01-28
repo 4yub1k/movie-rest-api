@@ -14,8 +14,8 @@ POSTGRES_USER=<db_user>
 POSTGRES_PASSWORD=<db_passwird>
 DJANGO_DEBUG=False
 SECRET_KEY=<your_secret_key>
-#ALLOWED_HOSTS=127.0.0.1,172.21.0.2
-ALLOWED_HOSTS=<hosts seperated by (,)>
+#ALLOWED_HOSTS=127.0.0.1 172.21.0.2
+ALLOWED_HOSTS=<hosts seperated by (space)>
 API_KEY=<api_key from omdbapi page>
 ```
 
@@ -28,7 +28,7 @@ API_KEY=<api_key from omdbapi page>
 ```cls
 
 - docker exec -it django_container /bin/bash
-   - python manage.py test
+   - pytest -rP
 ```
 ## Usage:
 
