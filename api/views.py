@@ -7,6 +7,7 @@ from api.models import Movie
 from rest_framework import status
 from requests import get
 from django.db.models import F
+from django.conf import settings
 
 
 def index(request):
@@ -37,7 +38,7 @@ def movie(request):
 
     if request.method == "POST":
         mv = request.query_params.get("movie", None)
-        url = f"https://www.omdbapi.com/?t={mv}&apikey=b1811c1"
+        url = f"https://www.omdbapi.com/?t={mv}&apikey={settings.API_KEY}"
         page = get(url).json()
         # print(page)
         if "Error" in page:

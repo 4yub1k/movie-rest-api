@@ -25,7 +25,8 @@ API_KEY=<api_key from omdbapi page>
 - docker-compose up
 ```
 ## Test:
-```
+```cls
+
 - docker exec -it django_container /bin/bash
    - python manage.py test
 ```
